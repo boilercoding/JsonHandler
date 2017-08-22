@@ -32,4 +32,7 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     //Retrofit Json
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+
+    //Design Library needed to Coordinator Layout
+    compile 'com.android.support:design:26.+'
 }
