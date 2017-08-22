@@ -4,12 +4,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import model.Feed;
 import model.children.Children;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -19,12 +24,59 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     private static final String BASE_URL = "https://www.reddit.com/";
+    private static final String LOGIN_URL = "https://www.reddit.com/api/login/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button btnGetData = (Button) findViewById(R.id.btnGetData);
+        Button btnLogin = (Button) findViewById(R.id.btn_login);
+        final EditText etName = (EditText) findViewById(R.id.input_username);
+        final EditText etPass = (EditText) findViewById(R.id.input_password);
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String uName = etName.getText().toString();
+                String pass = etPass.getText().toString();
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(LOGIN_URL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                RedditAPI redditAPI = retrofit.create(RedditAPI.class);
+
+                HashMap<String, String> headerMap = new HashMap<String, String>();
+                headerMap.put("Content-Type", "application/json");
+
+
+                Call<ResponseBody> call = redditAPI.login(headerMap, uName, uName, pass, "json");
+
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        Toast.makeText(MainActivity.this, "onResponse: Server Response: " + response.toString(), Toast.LENGTH_LONG).show();
+
+                        try{
+                            String json = response.body().string();
+                            Toast.makeText(MainActivity.this, "onResponse: json: " + json, Toast.LENGTH_LONG).show();
+
+                        }catch (IOException e){
+                            Toast.makeText(MainActivity.this,  "onResponse: JSONException: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Toast.makeText(MainActivity.this, "Something went wrong: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+
+
 
         btnGetData.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Call<Feed> call, Throwable t) {
-                        Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Something went wrong: " + t.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
             }

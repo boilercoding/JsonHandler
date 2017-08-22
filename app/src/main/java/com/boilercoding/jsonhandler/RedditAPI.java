@@ -27,9 +27,9 @@ public interface RedditAPI {
     @POST("{user}")
     Call<ResponseBody> login(
             @HeaderMap Map<String, String> headers,
-            @Path("user") String username,  //codingwithmitch
-            @Query("user") String user,       //?user=codingwithmitch
-            @Query("passwd") String password, //&passwd=Mitchtabian1234!
+            @Path("user") String username,  //anthonyredditandroid
+            @Query("user") String user,       //?user=anthonyredditandroid
+            @Query("passwd") String password, //&passwd=Password123
             @Query("api-type") String type    //&api-type=json
     );
 }
